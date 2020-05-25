@@ -13,16 +13,20 @@ function App() {
       if(busqueda === '') return;
         const imagenesPorPagina = 30;
         const key = '16713189-7aa606c51c73355eca7dd4b9a';
-        const url = `https://pixabay.com/api/?key=${key}&q=${busqueda}&per_page=${imagenesPorPagina}`
+        const url = `https://pixabay.com/api/?key=${key}&q=${busqueda}&per_page=${imagenesPorPagina}&page=${paginaactua}`
         const respuesta = await fetch(url);
         const resultado = await respuesta.json();
         guardarImagenes(resultado.hits);
         //calcular el total de paginas
         const calcularTotalPaingas = Math.ceil(resultado.totalHits / imagenesPorPagina);
         guardarTotalpaginas(calcularTotalPaingas);
+
+        //mover la pantalla al inicio
+        const jumbotron = document.querySelector('.jumbotron');
+        jumbotron.scrollIntoView({behavior: 'smooth'});
     } 
     consultarAPI();
-  },[busqueda])
+  },[busqueda,paginaactua])
 
   //definir la pagina anterior
   const paginaAnterior = () => {
@@ -44,7 +48,7 @@ function App() {
   return (
    <div className="container">
       <div className="jumbotron">
-        <p className="lead text-center">Buscador de Imagenes</p>
+        <p className="lead text-center">Buscador de Imágenes</p>
         <Formulario 
           guardarBusqueda={guardarBusqueda}
         />
@@ -53,17 +57,23 @@ function App() {
         <Listadoimagenes  
           imagenes = {imagenes}
         />
-        <button 
-          type='button'
-          className='btn btn-info mr-1'
-          onClick={paginaAnterior}
-        >&laquo; Anterior </button>
-        <button 
+        {(paginaactua === 1) ? null:(
+            <button 
+              type='button'
+              className='btn btn-info mr-1'
+              onClick={paginaAnterior}
+            >&laquo; Anterior </button>
+        )}
+        
+        {(paginaactua === totalpaginas ? null :(
+          <button 
           type='button'
           className='btn btn-info'
           onClick={paginaSiguiente}
         >Siguiente &raquo;</button>
-      </div>
+      
+        ))}
+    </div>
    </div>
   );
 }
